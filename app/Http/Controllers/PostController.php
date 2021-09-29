@@ -11,7 +11,7 @@ class PostController extends Controller
 {
     public function index()
     {
-
+        return response()->json([\App\Models\Post::all()->toArray()]);
     }
 
     public function store(PostRequest $request)
@@ -23,17 +23,22 @@ class PostController extends Controller
 //        $post->user_id = 1; // auth()->id
 //        $post->save();
 
-        $ImageName = date('Ymdhis') . rand(100,999) . '.jpg' ;
+//        return storage_path('images/p.jpg');
+//        return Storage::disk('public')->get('images/p.jpg');
+//        return Storage::disk('public')->download('images/p.jpg','sina');
+//        return Storage::disk('public')->url('images/p.jpg');
+//        Storage::put('file.jpg', $contents);
+
+        $ImageName = date('Ymdhis') . rand(100, 999) . '.jpg';
         Storage::putFileAs('images', $request->file('image'), $ImageName);
         Post::create([
-            'user_id' => auth()->id() ,
+            'user_id' => auth()->id(),
             'title' => $request->title,
             'text' => $request->text,
             'image' => $ImageName,
-
-
         ]);
-
         return response()->json();
     }
+
+
 }

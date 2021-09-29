@@ -20,37 +20,21 @@ use Illuminate\Support\Facades\Storage;
 
 
 
+Route::get('/',[\App\Http\Controllers\PostController::class,'index']);
 
+Route::post('/Posts', [\App\Http\Controllers\PostController::class , 'store'])->middleware('auth:sanctum');
 
-Route::post('/savePost', [\App\Http\Controllers\PostController::class , 'store'])->middleware('auth:sanctum');
-
-Route::get('/posts',function (){return response()->json([\App\Models\Post::all()->toArray()]);});
 
 Route::post('/user/login', [\App\Http\Controllers\Auth\UserController::class, 'login']);
 
 Route::get('/user/logout',[\App\Http\Controllers\Auth\UserController::class,'logout'])->middleware('auth:sanctum');
 
-Route::get('/user', function (){ return \request()->user('');})->middleware('auth:sanctum');
 
 
 
 
 
 
-Route::post('ppp', function (Request $request) {
-
-    //  return storage_path('images/p.jpg');
-
-//        return Storage::disk('public')->get('images/p.jpg');
-//        return Storage::disk('public')->download('images/p.jpg','sina');
-//        return Storage::disk('public')->url('images/p.jpg');
-
-//Storage::put('file.jpg', $contents);
-//         Manually specify a filename...
-//        $path = Storage::putFileAs('photos', new File('/path/to/photo'), 'photo.jpg');
-
-//888
-});
 
 
 

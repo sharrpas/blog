@@ -25,6 +25,7 @@ class UserController extends Controller
 
     }
 
+
     public function logout()
     {
         \request()->user()->tokens()->delete();
