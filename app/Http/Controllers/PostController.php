@@ -43,6 +43,12 @@ class PostController extends Controller
         return response()->json();
     }
 
+    public function show($id)
+    {
+        $post = Post::query()->find($id);
+        return response()->json($post);
+    }
+
     public function destroy(Request $request)
     {
         Post::query()->find($request->id)->delete();

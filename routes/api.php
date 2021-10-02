@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Storage;
 
 Route::get('/',[\App\Http\Controllers\PostController::class,'index']);
 
+Route::post('/{id}',[\App\Http\Controllers\PostController::class,'show']);
+
 Route::post('/Posts', [\App\Http\Controllers\PostController::class , 'store'])->middleware('auth:sanctum');
 
 Route::post('Delete', [\App\Http\Controllers\PostController::class, 'destroy'])->middleware('auth:sanctum');
