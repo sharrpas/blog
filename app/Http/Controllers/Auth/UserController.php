@@ -17,9 +17,11 @@ class UserController extends Controller
             'password' => 'required'
         ]);
 
-        $user = User::query()->where('username', $request->username)->where('password', $request->password)->firstOrFail();
+//      $user = User::query()->where('username', $request->username)->where('password', $request->password)->firstOrFail();
+        $user = User::query()->where('username', $request->username)->firstOrFail();
+        $pass_check = Hash::check($request -> password, User::query()->where('username', $request->username)->firstOrFail()->password);
 
-        if ($user) {
+        if ($user && $pass_check) {
             return $user->createToken('token_base_name')->plainTextToken;
         }
 

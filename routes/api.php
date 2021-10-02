@@ -1,9 +1,10 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
-
+use Illuminate\Support\Facades\Hash;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,7 +38,6 @@ Route::get('/user/logout',[\App\Http\Controllers\Auth\UserController::class,'log
 Route::post('/comments', [\App\Http\Controllers\CommentController::class , 'store']);
 
 Route::post('commentShow', [\App\Http\Controllers\CommentController::class,'show']);
-
 
 
 
