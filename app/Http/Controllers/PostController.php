@@ -7,6 +7,7 @@ use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+
 class PostController extends Controller
 {
     public function index()
@@ -38,6 +39,12 @@ class PostController extends Controller
             'image' => $ImageName,
         ]);
         return response()->json();
+    }
+
+    public function destroy(Request $request)
+    {
+        Post::query()->find($request->id)->delete();
+        return 'post ' . $request->id . ' deleted successfully';
     }
 
 
