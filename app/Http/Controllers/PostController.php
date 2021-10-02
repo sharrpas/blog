@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PostRequest;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 
@@ -12,7 +13,8 @@ class PostController extends Controller
 {
     public function index()
     {
-        return response()->json([\App\Models\Post::all()->toArray()]);
+//        return DB::table('posts')->paginate(5);
+        return response()->json(\App\Models\Post::query()->paginate(3));
     }
 
     public function store(PostRequest $request)
