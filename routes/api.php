@@ -24,7 +24,7 @@ Route::get('/',[\App\Http\Controllers\PostController::class,'index']);
 
 Route::post('/{id}',[\App\Http\Controllers\PostController::class,'show']);
 
-Route::post('/Posts', [\App\Http\Controllers\PostController::class , 'store'])->middleware('auth:sanctum');
+Route::post('/Post', [\App\Http\Controllers\PostController::class , 'store'])->middleware('auth:sanctum');
 
 Route::post('Delete', [\App\Http\Controllers\PostController::class, 'destroy'])->middleware('auth:sanctum');
 
@@ -34,7 +34,7 @@ Route::post('/user/login', [\App\Http\Controllers\Auth\UserController::class, 'l
 Route::get('/user/logout',[\App\Http\Controllers\Auth\UserController::class,'logout'])->middleware('auth:sanctum');
 
 
-
+Route::post('/comment/{post_id}', [\App\Http\Controllers\CommentController::class , 'store']);
 
 
 
