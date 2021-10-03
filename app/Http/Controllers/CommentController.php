@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 
-use App\Models\comment;
+use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\Request;
 
@@ -26,7 +26,7 @@ class CommentController extends Controller
         return response()->json(['message' => "Comment created for post " . $post->id]);
     }
 
-    public function destroy(comment $id)
+    public function destroy(Comment $id)
     {
         $id->delete();
         return 'Comment ' . $id->id . ' deleted successfully';

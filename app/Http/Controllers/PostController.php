@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PostRequest;
+use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -54,8 +55,9 @@ class PostController extends Controller
 
     public function destroy(Post $post)
     {
+        $post->comments()->delete();
         $post->delete();
-        return response()->json(['message' => 'post ' . $post->id . ' deleted successfully']);
+        return response()->json(['message' => 'post ' . $post->id . ' and all comments deleted successfully']);
     }
 
 
