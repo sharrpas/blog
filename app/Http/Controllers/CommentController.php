@@ -21,10 +21,10 @@ class CommentController extends Controller
         $comment->save();
     }
 
-    public function destroy($id)
+    public function destroy(comment $id)
     {
-        comment::query()->find($id)->delete();
-        return 'Comment ' . $id . ' deleted successfully';
+        $id->delete();
+        return 'Comment ' . $id->id . ' deleted successfully';
     }
 
 

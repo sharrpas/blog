@@ -63,7 +63,6 @@ class PostController extends Controller
             'text' => $request->text,
         ]);
 
-
     }
 
 
