@@ -66,6 +66,7 @@ class PostController extends Controller
             'title' => $request->title,
             'text' => $request->text,
         ]);
+        return response()->json('updated successfully');
     }
 
 

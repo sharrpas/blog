@@ -19,9 +19,10 @@ class CommentController extends Controller
     public function store(Request $request, Post $post)
     {
         $request->validate([
+            'name' => 'required',
             'comment' => 'required',
         ]);
-        $post->comments()->create($request->only('comment'));
+        $post->comments()->create($request->only('comment','name','email'));
         return response()->json(['message' => "Comment created for post " . $post->id]);
     }
 

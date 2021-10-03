@@ -33,8 +33,10 @@ class UserController extends Controller
 
     public function logout()
     {
-        \request()->user()->tokens()->delete();
-        return response([], 204);
+        if(\request()->user()->tokens()->delete())
+        {
+            return \response()->json('logged out');
+        }
     }
 
 
