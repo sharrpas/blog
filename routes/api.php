@@ -29,6 +29,8 @@ Route::post('/Posts', [\App\Http\Controllers\PostController::class , 'store'])->
 
 Route::post('Delete', [\App\Http\Controllers\PostController::class, 'destroy'])->middleware('auth:sanctum');
 
+Route::post('/post/{id}/update', [\App\Http\Controllers\PostController::class,'update'])->middleware('auth:sanctum');
+
 
 Route::post('/user/login', [\App\Http\Controllers\Auth\UserController::class, 'login']);
 

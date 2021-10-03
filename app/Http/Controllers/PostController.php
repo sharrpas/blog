@@ -55,5 +55,16 @@ class PostController extends Controller
         return 'post ' . $request->id . ' deleted successfully';
     }
 
+    public function update($id, Request $request)
+    {
+        Post::query()->find($id)->update([
+            'user_id' => auth()->id(),
+            'title' => $request->title,
+            'text' => $request->text,
+        ]);
+
+
+    }
+
 
 }
