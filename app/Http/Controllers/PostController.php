@@ -32,37 +32,40 @@ class PostController extends Controller
 //        return Storage::disk('public')->url('images/p.jpg');
 //        Storage::put('file.jpg', $contents);
 
-        $ImageName = date('Ymdhis') . rand(100, 999) . '.jpg';
-        Storage::putFileAs('images', $request->file('image'), $ImageName);
+        if ($request->hasFile('image')) {
+            $ImageName = date('Ymdhis') . rand(100, 999) . '.jpg';
+            Storage::putFileAs('images', $request->file('image'), $ImageName);
+        }
         Post::create([
             'user_id' => auth()->id(),
             'title' => $request->title,
             'text' => $request->text,
-            'image' => $ImageName,
+            'image' => $ImageName ?? null,
         ]);
-        return response()->json();
+        return response()->json(['message' => "Post created"]);
     }
 
-    public function show(Request $id)
+
+    public function show(Post $post)
     {
-        $post = Post::query()->find($id);
         return response()->json($post);
     }
 
-    public function destroy(Request $request)
+
+    public function destroy(Post $post)
     {
-        Post::query()->find($request->id)->delete();
-        return 'post ' . $request->id . ' deleted successfully';
+        $post->delete();
+        return response()->json(['message' => 'post ' . $post->id . ' deleted successfully']);
     }
 
-    public function update($id, Request $request)
+
+    public function update(Post $post, Request $request)
     {
-        Post::query()->find($id)->update([
+        $post->update([
             'user_id' => auth()->id(),
             'title' => $request->title,
             'text' => $request->text,
         ]);
-
     }
 
 

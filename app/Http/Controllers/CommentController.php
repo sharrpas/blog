@@ -4,21 +4,25 @@ namespace App\Http\Controllers;
 
 
 use App\Models\comment;
+use App\Models\Post;
 use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
-    public function show(Request $request)
+    public function show(Post $post)
     {
-          return response()->json(comment::all()->where('post_id' , '=' , $request->post_id));
+        //   return response()->json(Comment::query()->where('post_id' , '=' , $request->post_id)->get());
+        return response()->json($post->comments);
+
     }
 
-    public function store(Request $request)
+    public function store(Request $request, Post $post)
     {
-        $comment = new comment();
-        $comment->post_id = $request->post_id;
-        $comment->comment = $request->comment;
-        $comment->save();
+        $request->validate([
+            'comment' => 'required',
+        ]);
+        $post->comments()->create($request->only('comment'));
+        return response()->json(['message' => "Comment created for post " . $post->id]);
     }
 
     public function destroy(comment $id)
@@ -26,6 +30,7 @@ class CommentController extends Controller
         $id->delete();
         return 'Comment ' . $id->id . ' deleted successfully';
     }
+
 
 
 }

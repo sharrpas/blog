@@ -23,27 +23,25 @@ use Illuminate\Support\Facades\Hash;
 
 Route::get('/',[\App\Http\Controllers\PostController::class,'index']);
 
-Route::post('/PostShow',[\App\Http\Controllers\PostController::class,'show']);
+Route::get('/posts/{post}',[\App\Http\Controllers\PostController::class,'show']);
 
-Route::post('/Posts', [\App\Http\Controllers\PostController::class , 'store'])->middleware('auth:sanctum');
+Route::post('/posts', [\App\Http\Controllers\PostController::class , 'store'])->middleware('auth:sanctum');
 
-Route::post('Delete', [\App\Http\Controllers\PostController::class, 'destroy'])->middleware('auth:sanctum');
+Route::delete('/posts/{post}', [\App\Http\Controllers\PostController::class, 'destroy'])->middleware('auth:sanctum');
 
-Route::post('/post/{id}/update', [\App\Http\Controllers\PostController::class,'update'])->middleware('auth:sanctum');
+Route::patch('/posts/{post}/update', [\App\Http\Controllers\PostController::class,'update'])->middleware('auth:sanctum');
 
 
 Route::post('/user/login', [\App\Http\Controllers\Auth\UserController::class, 'login']);
 
-Route::get('/user/logout',[\App\Http\Controllers\Auth\UserController::class,'logout'])->middleware('auth:sanctum');
+Route::post('/user/logout',[\App\Http\Controllers\Auth\UserController::class,'logout'])->middleware('auth:sanctum');
 
 
-Route::post('/comments', [\App\Http\Controllers\CommentController::class , 'store']);
+Route::get('/posts/{post}/comments', [\App\Http\Controllers\CommentController::class,'show']);
 
-Route::post('commentShow', [\App\Http\Controllers\CommentController::class,'show']);
+Route::post('/posts/{post}/comments', [\App\Http\Controllers\CommentController::class , 'store']);
 
-Route::post('comment/{id}/delete', [\App\Http\Controllers\CommentController::class,'destroy'])->middleware('auth:sanctum');
-
-
+Route::delete('comment/{id}', [\App\Http\Controllers\CommentController::class,'destroy'])->middleware('auth:sanctum');
 
 
 
