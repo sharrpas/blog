@@ -22,7 +22,10 @@ class UserController extends Controller
         $pass_check = Hash::check($request -> password, User::query()->where('username', $request->username)->firstOrFail()->password);
 
         if ($user && $pass_check) {
-            return $user->createToken('token_base_name')->plainTextToken;
+            return response()->json([
+                'user' => $user,
+                'token' => $user->createToken('token_base_name')->plainTextToken
+            ]);
         }
 
     }
