@@ -41,6 +41,8 @@ Route::post('/comments', [\App\Http\Controllers\CommentController::class , 'stor
 
 Route::post('commentShow', [\App\Http\Controllers\CommentController::class,'show']);
 
+Route::post('comment/{id}/delete', [\App\Http\Controllers\CommentController::class,'destroy'])->middleware('auth:sanctum');
+
 
 
 
