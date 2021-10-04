@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PostRequest;
+use App\Models\Category;
 use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\Request;
@@ -15,10 +16,10 @@ class PostController extends Controller
     public function index()
     {
 //        return DB::table('posts')->paginate(5);
-        return response()->json(\App\Models\Post::query()->paginate(3));
+        return response()->json(\App\Models\Post::query()->paginate(10));
     }
 
-    public function store(PostRequest $request)
+    public function store(Category $category, PostRequest $request)
     {
 //        $post = new \App\Models\Post();
 //        $post->title = $request->title;
@@ -33,12 +34,18 @@ class PostController extends Controller
 //        return Storage::disk('public')->url('images/p.jpg');
 //        Storage::put('file.jpg', $contents);
 
+        $request->validate([
+            'title' => 'required|min:4|max:20',
+            'text' => 'required|min:20',
+        ]);
+
         if ($request->hasFile('image')) {
             $ImageName = date('Ymdhis') . rand(100, 999) . '.jpg';
             Storage::putFileAs('images', $request->file('image'), $ImageName);
         }
         Post::create([
             'user_id' => auth()->id(),
+            'category_id' => $category->id,
             'title' => $request->title,
             'text' => $request->text,
             'image' => $ImageName ?? null,
