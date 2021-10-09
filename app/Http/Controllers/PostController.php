@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PostRequest;
 use App\Models\Category;
 use App\Models\Comment;
+use App\Models\Like;
 use App\Models\Post;
+use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -56,7 +58,8 @@ class PostController extends Controller
 
     public function show(Post $post)
     {
-        return response()->json($post);
+        $like = $post->likes()->where('post_id','=', $post->id)->count();
+        return response()->json([$post, 'likes: ' . $like ]);
     }
 
 
@@ -76,6 +79,20 @@ class PostController extends Controller
             'text' => $request->text,
         ]);
         return response()->json('updated successfully');
+    }
+
+
+    public function like(Post $post, Request $request)
+    {
+        $ip = $request->ip();
+
+        if (Like::query()->where('post_id','=',$post->id)->where('ip','=',$ip)->exists()){
+            return \response()->json('you already liked this post');
+        }
+        else{
+            $post->likes()->create(['ip' => $ip]);
+            return \response()->json('liked');
+        }
     }
 
 

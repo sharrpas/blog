@@ -27,6 +27,8 @@ Route::delete('/posts/{post}', [\App\Http\Controllers\PostController::class, 'de
 
 Route::patch('/posts/{post}/update', [\App\Http\Controllers\PostController::class,'update'])->middleware('auth:sanctum');
 
+Route::post('posts/{post}/like',[\App\Http\Controllers\PostController::class,'like']);
+
 
 
 Route::post('/user/login', [\App\Http\Controllers\Auth\UserController::class, 'login']);
@@ -50,6 +52,16 @@ Route::post('/categories',[\App\Http\Controllers\CategoryController::class,'stor
 Route::delete('/categories/{category}',[\App\Http\Controllers\CategoryController::class,'destroy'])->middleware('auth:sanctum');
 
 Route::patch('/categories/{category}/update', [\App\Http\Controllers\CategoryController::class,'update'])->middleware('auth:sanctum');
+
+
+
+
+
+
+
+
+
+
 
 
 
