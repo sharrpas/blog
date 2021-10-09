@@ -56,6 +56,13 @@ Route::patch('/categories/{category}/update', [\App\Http\Controllers\CategoryCon
 
 
 
+Route::get('pp',function (){
+
+
+
+
+});
+
 
 
 

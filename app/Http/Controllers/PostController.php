@@ -7,6 +7,8 @@ use App\Models\Category;
 use App\Models\Comment;
 use App\Models\Like;
 use App\Models\Post;
+use App\Models\PostTag;
+use App\Models\Tag;
 use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -41,25 +43,51 @@ class PostController extends Controller
             'text' => 'required|min:20',
         ]);
 
-        if ($request->hasFile('image')) {
-            $ImageName = date('Ymdhis') . rand(100, 999) . '.jpg';
-            Storage::putFileAs('images', $request->file('image'), $ImageName);
+        DB::beginTransaction();
+        try {
+
+            if ($request->hasFile('image')) {
+                $ImageName = date('Ymdhis') . rand(100, 999) . '.jpg';
+                Storage::putFileAs('images', $request->file('image'), $ImageName);
+            }
+            $post = Post::create([
+                'user_id' => auth()->id(),
+                'category_id' => $category->id,
+                'title' => $request->title,
+                'text' => $request->text,
+                'image' => $ImageName ?? null,
+            ]);
+
+
+            $tags = explode(' ', $request->tag);
+
+            foreach ($tags as $item){
+
+                $tag = Tag::query()->firstOrCreate([
+                    'tag' => $item
+                ]);
+
+                PostTag::create([
+                    'post_id' => $post->id,
+                    'tag_id' => $tag->id
+                ]);
+
+            }
+
+            Db::commit();
+
+            return response()->json(['message' => "Post created"]);
+
+        } catch (\Throwable $exception) {
+            DB::rollBack();
         }
-        Post::create([
-            'user_id' => auth()->id(),
-            'category_id' => $category->id,
-            'title' => $request->title,
-            'text' => $request->text,
-            'image' => $ImageName ?? null,
-        ]);
-        return response()->json(['message' => "Post created"]);
     }
 
 
     public function show(Post $post)
     {
-        $like = $post->likes()->where('post_id','=', $post->id)->count();
-        return response()->json([$post, 'likes: ' . $like ]);
+        $like = $post->likes()->where('post_id', '=', $post->id)->count();
+        return response()->json([$post, 'likes: ' . $like, $post->tags()->get(['tag'])]);
     }
 
 
@@ -86,10 +114,9 @@ class PostController extends Controller
     {
         $ip = $request->ip();
 
-        if (Like::query()->where('post_id','=',$post->id)->where('ip','=',$ip)->exists()){
+        if (Like::query()->where('post_id', '=', $post->id)->where('ip', '=', $ip)->exists()) {
             return \response()->json('you already liked this post');
-        }
-        else{
+        } else {
             $post->likes()->create(['ip' => $ip]);
             return \response()->json('liked');
         }
