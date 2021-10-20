@@ -12,6 +12,26 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class,'user_role');
+    }
+
+    public function hasRole($role)
+    {
+        return (bool) $this->roles()->where('name', $role)->count();
+    }
+
+    public function hasPermission($permission)
+    {
+        return (bool) $this->roles()->whereHas('permissions', function ($query) use ($permission) {
+            $query->where('name', $permission);
+        })->count();
+    }
+
+
+
     /**
      * The attributes that are mass assignable.
      *

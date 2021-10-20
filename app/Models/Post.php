@@ -14,18 +14,18 @@ class Post extends Model
         return $this->hasMany(Comment::class);
     }
 
-    public function categoris() {
-        return $this->hasOne(Category::class);
+    public function category() {
+        return $this->belongsTo(Category::class);
     }
 
     public function likes()
     {
-        return $this->hasMany(Like::class);
+        return $this->hasMany(Like::class,'post_id');
     }
 
     public function tags()
     {
-        return $this->belongsToMany(Tag::class);
+        return $this->belongsToMany(Tag::class,'post_tag');
     }
 
 }

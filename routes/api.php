@@ -1,10 +1,12 @@
 <?php
 
-use App\Models\User;
-use Illuminate\Http\Request;
+use App\Http\Controllers\user\CommentController;
+use App\Http\Controllers\TagController;
+use App\Http\Controllers\user\CategoryController;
+use App\Http\Controllers\user\PostController;
+use App\Http\Controllers\user\UserController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Hash;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -17,51 +19,34 @@ use Illuminate\Support\Facades\Hash;
 |
 */
 
-Route::get('/',[\App\Http\Controllers\PostController::class,'index']);
+include 'admin.php';
 
-Route::get('/posts/{post}',[\App\Http\Controllers\PostController::class,'show']);
+Route::post('/user/signup', [UserController::class, 'signup']);
+Route::post('/user/login', [UserController::class, 'login']);
+Route::post('/user/logout',[UserController::class,'logout'])->middleware('auth:sanctum');
+Route::post('user/change/pass',[UserController::class, 'changePass'])->middleware('auth:sanctum');
 
-Route::post('/posts/{category}', [\App\Http\Controllers\PostController::class , 'store'])->middleware('auth:sanctum');
+Route::prefix('profile/posts')->middleware('auth:sanctum')->group(function () {
+    Route::get('/',[PostController::class,'index']);
+    Route::get('/{post}',[PostController::class,'show']);
+    Route::post('/{category}', [PostController::class , 'store']);
+    Route::delete('/{post}', [PostController::class, 'destroy']);
+    Route::patch('/{post}/update', [PostController::class,'update']);
+});
 
-Route::delete('/posts/{post}', [\App\Http\Controllers\PostController::class, 'destroy'])->middleware('auth:sanctum');
 
-Route::patch('/posts/{post}/update', [\App\Http\Controllers\PostController::class,'update'])->middleware('auth:sanctum');
-
+Route::get('posts',[\App\Http\Controllers\PostController::class,'index']);
+Route::get('posts/category',[CategoryController::class,'index']);
+Route::get('posts/category/{category}',[CategoryController::class,'show']);
+Route::get('posts/{post}',[\App\Http\Controllers\PostController::class,'show']);
 Route::post('posts/{post}/like',[\App\Http\Controllers\PostController::class,'like']);
 
+Route::get('tags',[TagController::class,'index']);
+Route::get('posts/tags/{tag}',[TagController::class,'show']);
 
+Route::get('/posts/{post}/comments', [CommentController::class,'show']);
+Route::post('/posts/{post}/comments', [CommentController::class , 'store'])->middleware('auth:sanctum');
 
-Route::post('/user/login', [\App\Http\Controllers\Auth\UserController::class, 'login']);
-
-Route::post('/user/logout',[\App\Http\Controllers\Auth\UserController::class,'logout'])->middleware('auth:sanctum');
-
-
-
-Route::get('/posts/{post}/comments', [\App\Http\Controllers\CommentController::class,'show']);
-
-Route::post('/posts/{post}/comments', [\App\Http\Controllers\CommentController::class , 'store']);
-
-Route::delete('comment/{id}', [\App\Http\Controllers\CommentController::class,'destroy'])->middleware('auth:sanctum');
-
-
-
-Route::get('/categories',[\App\Http\Controllers\CategoryController::class,'index']);
-
-Route::post('/categories',[\App\Http\Controllers\CategoryController::class,'store'])->middleware('auth:sanctum');
-
-Route::delete('/categories/{category}',[\App\Http\Controllers\CategoryController::class,'destroy'])->middleware('auth:sanctum');
-
-Route::patch('/categories/{category}/update', [\App\Http\Controllers\CategoryController::class,'update'])->middleware('auth:sanctum');
-
-
-
-
-Route::get('pp',function (){
-
-
-
-
-});
 
 
 
