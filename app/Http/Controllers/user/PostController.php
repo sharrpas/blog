@@ -96,7 +96,7 @@ class PostController extends Controller
     {
         $request->validate([
             'title' => 'required|min:4|max:20',
-            'text' => 'required|min:20',
+            'text' => 'required|min:15',
         ]);
         if ($post->user_id == auth()->id()) {
             $post->update([

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -15,6 +16,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        $this->call(PermissionSeeder::class);
+
 
         $user = User::query()->Create([
             'name' => "Sina",
@@ -28,6 +31,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $user->roles()->attach($role->id);
+
+
 
     }
 }

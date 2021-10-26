@@ -18,7 +18,7 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required',
             'username' => 'unique:App\Models\User,username',
-            'password' => [Password::required(), Password::min(4)->numbers()/*->mixedCase()->letters()->symbols()->uncompromised()*/, 'confirmed' ],
+            'password' => [Password::required(), Password::min(4)->numbers()/*->mixedCase()->letters()->symbols()->uncompromised()*/, 'confirmed'],
             'image' => 'image',
         ]);
 
@@ -27,7 +27,7 @@ class UserController extends Controller
         $user->name = $request->name;
         $user->username = $request->username;
         $user->image = $request->image ?? '#';
-        $user->password =  Hash::make($request->password);
+        $user->password = Hash::make($request->password);
         $user->save();
 
         return response()->json(['message' => 'You have successfully registered, utilize your username and password to log in']);
@@ -43,15 +43,21 @@ class UserController extends Controller
         ]);
 
 //      $user = User::query()->where('username', $request->username)->where('password', $request->password)->firstOrFail();
-        $user = User::query()->where('username', $request->username)->firstOrFail();
-        $pass_check = Hash::check($request -> password, User::query()->where('username', $request->username)->firstOrFail()->password);
+
+        if (!$user = User::query()->where('username', $request->username)->first()) {
+            return response()->json([
+                "message" => "User not found"
+            ]);
+        }
+
+        $pass_check = Hash::check($request->password, User::query()->where('username', $request->username)->firstOrFail()->password);
 
         if ($user && $pass_check) {
             return response()->json([
                 'user' => $user,
                 'token' => $user->createToken('token_base_name')->plainTextToken
             ]);
-        }else{
+        } else {
             return response()->json(['message' => 'Your username or password is incorrect']);
         }
 
@@ -60,13 +66,12 @@ class UserController extends Controller
 
     public function logout()
     {
-        if(\request()->user()->tokens()->delete())
-        {
-            return \response()->json('logged out');
-        }
-        else{
-            return response()->json(['message' => 'token ERROR']);
-        }
+        /** @var User $user */
+        $user = auth()->user();
+
+        $user->tokens()->delete();
+
+        return \response()->json('logged out');
     }
 
 
@@ -76,13 +81,13 @@ class UserController extends Controller
             'old_pass' => 'required',
             'new_pass' => 'required',
         ]);
-        $pass_check = Hash::check($request -> old_pass, User::query()->where('id','=', auth()->id())->firstOrFail()->password);
-        if ($pass_check){
-            User::query()->where('id','=', auth()->id())->update([
+        $pass_check = Hash::check($request->old_pass, User::query()->where('id', '=', auth()->id())->firstOrFail()->password);
+        if ($pass_check) {
+            User::query()->where('id', '=', auth()->id())->update([
                 'password' => Hash::make($request->new_pass)
             ]);
-            return response()->json('password changed to' . $request->new_pass);
-        }else{
+            return response()->json('password changed to ' . $request->new_pass);
+        } else {
             return response()->json(['message' => 'token ERROR']);
         }
     }

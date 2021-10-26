@@ -14,7 +14,7 @@ class AddIsConfigToPostsTable extends Migration
     public function up()
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->boolean('is_config')->after('text');
+            $table->boolean('is_config')->after('text')->default(false);
         });
     }
 
@@ -26,7 +26,7 @@ class AddIsConfigToPostsTable extends Migration
     public function down()
     {
         Schema::table('posts', function (Blueprint $table) {
-            //
+            $table->dropColumn('is_config');
         });
     }
 }

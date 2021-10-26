@@ -15,7 +15,10 @@ class EditIsConfirmInPostsTable extends Migration
     {
         Schema::table('posts', function (Blueprint $table) {
             $table->dropColumn('is_config');
-            $table->enum('status',['accepted','rejected','pending'])->after('text')->default('pending');
+        });
+
+        Schema::table('posts', function (Blueprint $table) {
+            $table->enum('status', ['accepted', 'rejected', 'pending'])->after('text')->default('pending');
         });
     }
 
@@ -27,7 +30,12 @@ class EditIsConfirmInPostsTable extends Migration
     public function down()
     {
         Schema::table('posts', function (Blueprint $table) {
-
+            $table->dropColumn('status');
         });
+
+        Schema::table('posts', function (Blueprint $table) {
+            $table->boolean('is_config')->after('text')->default(false);
+        });
+
     }
 }

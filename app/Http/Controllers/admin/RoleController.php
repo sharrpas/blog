@@ -62,7 +62,8 @@ class RoleController extends Controller
             ]);
             $role->permissions()->sync($request->permissions);
 
-            return \response()->json(['role changed to' , $request->name , $request->permissions]);
+            $Role = Role::with('permissions')->find($role);
+            return response()->json($Role);
         }
     }
 
