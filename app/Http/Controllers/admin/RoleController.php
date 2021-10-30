@@ -69,7 +69,8 @@ class RoleController extends Controller
 
     public function delete(Role $role)
     {
-        throw_if($role->name == 'super_admin', new AdminExceptin('you can not delete the SUPER_ADMIN role'));
+        throw_if($role->name == 'super_admin',
+            new AdminExceptin('you can not delete the SUPER_ADMIN role'));
 
         $role->permissions()->detach();
         $role->delete();

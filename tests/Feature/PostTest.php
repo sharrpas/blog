@@ -8,12 +8,14 @@ use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class PostTest extends TestCase
 {
     use RefreshDatabase;
+    use WithFaker;
 
     public function test_posts_count_must_zero()
     {
@@ -22,20 +24,15 @@ class PostTest extends TestCase
 
     public function test_user_can_see_their_posts()
     {
-        $user = User::factory()->create();
-        $this->assertDatabaseHas('users', [
-            'name' => 'sina',
-            'username' => 'sina',
-        ]);
+        $user = User::factory()->create(['username' => 'sina']);
 
         $response = $this->postJson(route('login'), [
             'username' => 'sina',
             'password' => 'password'
         ]);
-        $this->assertDatabaseCount('personal_access_tokens', 1);
 
-        Post::factory()->count(2)->create();
-        Post::factory()->state(['user_id' => '2'])->create();
+        Post::factory()->count(2)->create(['user_id' => $user->id]);
+        Post::factory()->create();
         $this->assertDatabaseCount('posts', 3);
 
         $this->getJson(route('profile-posts-all'), [
@@ -46,21 +43,20 @@ class PostTest extends TestCase
         ]]]);
     }
 
-    public function test_user_can_see_their_complete_post()
+    public function test_user_can_see_their_single_post()
     {
-        $user = User::factory()->create();
-        $this->assertDatabaseHas('users', [
-            'name' => 'sina',
-            'username' => 'sina',
-        ]);
+        User::factory()->create(['username' => 'sina']);
+
         $response = $this->postJson(route('login'), [
             'username' => 'sina',
             'password' => 'password'
         ]);
         $this->assertDatabaseCount('personal_access_tokens', 1);
 
+
         Post::factory()->count(2)->create();
         Post::factory()->state(['user_id' => '2'])->create();
+
         $this->assertDatabaseCount('posts', 3);
 
         $this->getJson(route('profile-posts-onePost', ['post' => '1']), ['authorization' => 'Bearer ' . $response['token']])->assertJson([
@@ -71,20 +67,25 @@ class PostTest extends TestCase
 
     public function test_user_can_send_post()
     {
-        User::factory()->create();
-        $this->assertDatabaseHas('users', ['name' => 'sina', 'username' => 'sina',]);
+        User::factory()->create(['username' => 'sina']);
 
         $response = $this->postJson(route('login'), ['username' => 'sina', 'password' => 'password']);
+
         $this->assertDatabaseCount('personal_access_tokens', 1);
+
         Category::factory()->create();
         $file = UploadedFile::fake()->image('p.jpg');
 
         $this->postJson(route('profile-posts-addPost', ['category' => 1]), [
-            'title' => 'HI4550',
-            'text' => '1234567891011ss',
+            'title' => 'electronic',
+            'text' => $this->faker->text,
             'image' => $file,
         ], ['authorization' => 'Bearer ' . $response['token']])->assertSee('Post created');
         $this->assertDatabaseCount('posts', 1);
+
+        $this->assertDatabaseHas('posts', [
+            'title' => 'electronic'
+        ]);
     }
 
     public function test_user_can_delete_their_post()
@@ -92,6 +93,14 @@ class PostTest extends TestCase
         $this->test_user_can_send_post();
         $this->deleteJson(route('profile-posts-deletePost', ['post' => 1]));
         $this->assertDatabaseCount('posts', 0);
+    }
+
+    public function test_user_can_not_delete_others_posts()
+    {
+        $this->test_user_can_send_post();
+        Post::factory()->create();
+        $this->deleteJson(route('profile-posts-deletePost', ['post' => 2]))
+            ->assertSee('You do not have access');
     }
 
     public function test_user_can_update_their_post()
@@ -102,6 +111,13 @@ class PostTest extends TestCase
         $this->assertDatabaseHas('posts', ['title' => '12345', 'text' => 'hh1234567891010',]);
     }
 
+    public function test_user_can_not_update_others_posts()
+    {
+        $this->test_user_can_send_post();
+        Post::factory()->create();
+        $this->patchJson(route('profile-posts-updatePost', ['post' => 2]), ['title' => '12345', 'text' => 'hh1234567891010',])
+            ->assertSee('You do not have access');
+    }
 
     public function test_show_all_posts_for_everyone()
     {
@@ -114,21 +130,17 @@ class PostTest extends TestCase
             ->assertDontSee('pending');
     }
 
-    public function test_show_all_categories_for_everyone()
-    {
-        Category::factory()->create();
-        $this->getJson(route('categories-all'))->assertSee('C1');
-    }
-
     public function test_show_all_posts_in_one_category()
     {
-        Category::factory()->create();
-        Post::factory()->count(2)->create();
-        Post::factory()->state(['user_id' => '2', 'status' => 'accepted'])->create();
+        Post::factory()->state(['status' => 'accepted'])->create();
         Post::factory()->state(['status' => 'accepted', 'category_id' => 2])->create();
-        $this->assertDatabaseCount('posts', 4);
+        Post::factory()->state(['status' => 'accepted', 'category_id' => 2])->create();
+        $this->assertDatabaseCount('posts', 3);
 
-        $this->getJson(route('posts-all-oneCategory', 1))->assertJsonFragment(['id' => 3]);
+        $this->getJson(route('posts-all-oneCategory', 2))->assertJsonStructure(['data' => [
+            ['id', 'title', 'text'],
+            ['id', 'title', 'text'],
+        ]]);
     }
 
     public function test_show_one_complete_post()
@@ -194,7 +206,7 @@ class PostTest extends TestCase
 
     public function test_users_can_send_comment()
     {
-        User::factory()->create();
+        User::factory()->create(['username' => 'sina']);
         $post = Post::factory()->create();
         $response = $this->postJson(route('login'), [
             'username' => 'sina',

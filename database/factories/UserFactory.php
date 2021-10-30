@@ -24,7 +24,7 @@ class UserFactory extends Factory
     {
         return [
             'name' => "sina",
-            'username' => 'sina',
+            'username' => $this->faker->userName,
             'image' => '#',
             'password' => bcrypt('password')
         ];

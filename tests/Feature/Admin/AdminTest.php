@@ -16,23 +16,19 @@ class AdminTest extends TestCase
 {
     use RefreshDatabase;
 
-//todo GIT push
 
     public function test_delete_post_permission_can_delete_all_users_posts()
     {
         Artisan::call('db:seed');
         User::factory()->has(Role::factory())->create(['username' => 'sky']);
-        $this->assertDatabaseCount('users', 2);
-        $this->assertDatabaseCount('roles', 2);
-        $this->assertDatabaseCount('user_role', 2);
-        Post::factory()->count(3)->create(['user_id' => '2']);
-        $this->assertDatabaseCount('posts', 3);
+        Post::factory()->count(3)->create();
 
         $response = $this->postJson(route('login'), [
             'username' => 'sina',
             'password' => 'nnn'
         ]); // ['authorization' => 'Bearer ' . $response['token']]
 
+        $this->assertDatabaseCount('posts', 3);
         $this->deleteJson(route('posts-deletePost', 1), [], ['authorization' => 'Bearer ' . $response['token']]);
         $this->assertDatabaseCount('posts', 2);
     }
@@ -83,7 +79,6 @@ class AdminTest extends TestCase
         $this->assertDatabaseHas('posts', ['status' => 'accepted']);
     }
 
-
     public function test_everyone_can_see_all_categories()
     {
         Category::factory()->count(2)->create();
@@ -111,6 +106,17 @@ class AdminTest extends TestCase
         $this->deleteJson(route('categories-delete', 1), [], ['authorization' => 'Bearer ' . $response['token']])
             ->assertSee('category deleted');
         $this->assertDatabaseCount('categories', 1);
+    }
+
+    public function test_if_a_category_has_posts_nobody_can_delete_it()
+    {
+        Artisan::call('db:seed');
+        Post::factory()->count(2)->create();
+        $response = $this->postJson(route('login'), ['username' => 'sina', 'password' => 'nnn']);
+        $this->assertDatabaseCount('categories', 2);
+        $this->deleteJson(route('categories-delete', 1), [], ['authorization' => 'Bearer ' . $response['token']])
+            ->assertSee('the category has posts so it can not be deleted');
+        $this->assertDatabaseCount('categories', 2);
     }
 
     public function test_admins_can_update_category()

@@ -10,10 +10,7 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    public function index()
-    {
-        return response()->json(CategoryResource::collection(Category::all()));
-    }
+
 
     public function store(Request $request)
     {

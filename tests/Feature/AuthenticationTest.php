@@ -65,8 +65,22 @@ class AuthenticationTest extends TestCase
         $this->assertDatabaseCount('categories', 0);
     }
 
+    public function test_login_did_not_works_if_the_username_and_password_is_incorrect()
+    {
+        User::query()->create([
+            'name' => "sina",
+            'username' => 'sina',
+            'image' => '#',
+            'password' => bcrypt('password')
+        ]);
 
-    public function test_signup_works()
+        $this->postJson(route('login'), [
+            'username' => 'sina',
+            'password' => 'PASS'
+        ])->assertSee('Your username or password is incorrect');
+    }
+
+    public function test_signup_works() // todo validation test
     {
         $file = UploadedFile::fake()->image('p.jpg');
 
@@ -129,31 +143,30 @@ class AuthenticationTest extends TestCase
         $this->postJson(route('changePass'),[
             'old_pass' => 'password',  'new_pass' => '1234'
         ],['authorization' => 'Bearer ' . $response['token']])->assertSee('password changed to 1234');
-
     }
 
+    public function test_change_pass_error()
+    {
+        $user = User::query()->create([
+            'name' => "sina",
+            'username' => 'sina',
+            'image' => '#',
+            'password' => bcrypt('password')
+        ]);
 
+        $response = $this->postJson(route('login'), [
+            'username' => 'sina',
+            'password' => 'password'
+        ]);
+        $this->assertDatabaseCount('personal_access_tokens', 1);
 
+        $this->postJson(route('changePass'),[
+            'old_pass' => 'PASS',  'new_pass' => '1234'
+        ],['authorization' => 'Bearer ' . $response['token']])
+            ->assertSee('token ERROR');
 
-
-
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

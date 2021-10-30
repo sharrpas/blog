@@ -35,50 +35,42 @@ class PostController extends Controller
             'image' => 'image',
         ]);
 
-        DB::beginTransaction();
-        try {
+        if ($request->hasFile('image')) {
+            $ImageName = date('Ymdhis') . rand(100, 999) . '.jpg';
+            Storage::putFileAs('images', $request->file('image'), $ImageName);
+        }
+        $post = Post::create([
+            'user_id' => auth()->id(),
+            'category_id' => $category->id,
+            'title' => $request->title,
+            'text' => $request->text,
+            'image' => $ImageName ?? null,
+        ]);
 
-            if ($request->hasFile('image')) {
-                $ImageName = date('Ymdhis') . rand(100, 999) . '.jpg';
-                Storage::putFileAs('images', $request->file('image'), $ImageName);
-            }
-            $post = Post::create([
-                'user_id' => auth()->id(),
-                'category_id' => $category->id,
-                'title' => $request->title,
-                'text' => $request->text,
-                'image' => $ImageName ?? null,
+        $tags = explode(' ', $request->tag);
+
+        foreach ($tags as $item) {
+            $tag = Tag::query()->firstOrCreate([
+                'tag' => $item
             ]);
 
-            $tags = explode(' ', $request->tag);
-
-            foreach ($tags as $item){
-
-                $tag = Tag::query()->firstOrCreate([
-                    'tag' => $item
-                ]);
-
-                PostTag::create([
-                    'post_id' => $post->id,
-                    'tag_id' => $tag->id
-                ]);
-            }
-
-            Db::commit();
-
-            return response()->json(['message' => "Post created"]);
-
-        } catch (\Throwable $exception) {
-            DB::rollBack();
-            return response()->json(['message' => "error"]);
+            PostTag::create([
+                'post_id' => $post->id,
+                'tag_id' => $tag->id
+            ]);
         }
+
+        Db::commit();
+
+        return response()->json(['message' => "Post created"]);
+
     }
 
 
     public function show(Post $post)
     {
 //        $like = $post->likes()->where('post_id', '=', $post->id)->count();
-        return response()->json(PostResource::make($post->load('tags'),$post->load('comments')));
+        return response()->json(PostResource::make($post->load('tags'), $post->load('comments')));
     }
 
 
@@ -90,6 +82,7 @@ class PostController extends Controller
             $post->delete();
             return response()->json(['message' => 'post ' . $post->id . ' and all comments deleted successfully']);
         }
+        return \response()->json(['message' => 'You do not have access']);
     }
 
     public function update(Post $post, Request $request)
@@ -106,9 +99,8 @@ class PostController extends Controller
             ]);
             return response()->json('updated successfully');
         }
+        return \response()->json(['message' => 'You do not have access']);
     }
-
-
 
 
 }
