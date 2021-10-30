@@ -30,7 +30,7 @@ class PostController extends Controller
         $post->update([
             'status' => $request->status
         ]);
-        return response()->json(['message' => 'post '.$request->status]);
+        return $this->response(1,'post '.$request->status);
     }
 
 
@@ -45,7 +45,7 @@ class PostController extends Controller
         $post->comments()->delete();
         $post->tags()->detach();
         $post->delete();
-        return response()->json(['message' => 'post ' . $post->id . ' and all comments deleted successfully']);
+        return $this->response(1, 'post ' . $post->id . ' and all comments deleted successfully');
     }
 
 

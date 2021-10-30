@@ -11,6 +11,6 @@ class CommentController extends Controller
     public function destroy(Comment $id)
     {
         $id->delete();
-        return response()->json('Comment ' . $id->id . ' deleted successfully');
+        return $this->response(1,'Comment ' . $id->id . ' deleted successfully');
     }
 }

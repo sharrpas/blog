@@ -61,8 +61,7 @@ class PostController extends Controller
         }
 
         Db::commit();
-
-        return response()->json(['message' => "Post created"]);
+        return $this->response(1,'Post created');
 
     }
 
@@ -80,9 +79,9 @@ class PostController extends Controller
             $post->comments()->delete();
             $post->tags()->detach();
             $post->delete();
-            return response()->json(['message' => 'post ' . $post->id . ' and all comments deleted successfully']);
+            return $this->response(1,'post ' . $post->id . ' and all comments deleted successfully');
         }
-        return \response()->json(['message' => 'You do not have access']);
+        return $this->response(0,'You do not have access');
     }
 
     public function update(Post $post, Request $request)
@@ -97,9 +96,9 @@ class PostController extends Controller
                 'text' => $request->text,
                 'status' => 'pending',
             ]);
-            return response()->json('updated successfully');
+            return $this->response(1,'updated successfully');
         }
-        return \response()->json(['message' => 'You do not have access']);
+        return $this->response(0,'You do not have access');
     }
 
 

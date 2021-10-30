@@ -30,7 +30,7 @@ class AdminController extends Controller
 
         $user->roles()->attach($request->role);
 
-        return response()->json(['message' => 'User created successfully', 'Role' => $request->role]);
+        return $this->response(1,'User created successfully, '. 'Role: ' . $request->role);
     }
 
     public function update(User $user, Request $request)
@@ -39,17 +39,19 @@ class AdminController extends Controller
 
         if($user->roles()->where('role_id',$request->role)->exists())
         {
-            return response()->json(['message' => "Role name already exists as a user"]);
+            return $this->response(0,"Role name already exists as a user");
         }
 
         $user->roles()->attach($request->role);
-        return response()->json(['message' => 'The role was successfully created for the user']);
+        return $this->response(1,"The role was successfully created for the user");
+
     }
 
     public function destroy(User $user)
     {
         $user->roles()->detach();
-        return response()->json(['message' => 'The role was successfully removed from the user']);
+        return $this->response(1,"The role was successfully removed from the user");
+
     }
 
 }

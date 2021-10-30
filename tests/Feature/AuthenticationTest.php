@@ -98,6 +98,18 @@ class AuthenticationTest extends TestCase
         ]);
     }
 
+    public function test_signup_validation()
+    {
+        User::factory()->create(['username' => 'sina']);
+        $this->postJson(route('signup'), [
+            'username' => 'sina',
+            'password' => '1234',
+            'password_confirmation' => '1230000000',
+            'image' => '%%%',
+        ])
+        ->assertSee(['The name field is required','The username has already been taken','The password confirmation does not match','The image must be an image']);
+    }
+
 
     public function test_logout_works()
     {

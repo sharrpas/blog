@@ -32,14 +32,10 @@ class RoleController extends Controller
 
         } catch (\Exception $exception) {
             DB::rollBack();
-            return [
-                'message' => "Error"
-            ];
+           return $this->response(0,'ERROR');
         }
         DB::commit();
-        return [
-            'message' => "Role created"
-        ];
+        return $this->response(1,'Role created');
     }
 
     public function show($role)
@@ -74,7 +70,7 @@ class RoleController extends Controller
 
         $role->permissions()->detach();
         $role->delete();
-        return \response()->json('role deleted');
+        return $this->response(1,'role deleted');
     }
 
 

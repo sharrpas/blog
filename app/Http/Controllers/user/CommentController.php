@@ -26,15 +26,10 @@ class CommentController extends Controller
             'comment' => $request->comment,
             'name' => auth()->user()->name,
         ]);
-        return response()->json(['message' => "Comment created for post " . $post->id]);
+       return $this->response(1,"Comment created for post " . $post->id);
     }
 
 
-//{
-//    error: false,
-//    code: 200,
-//    message: "mwssage",
-//    data: ""
-//}
+
 
 }

@@ -20,7 +20,7 @@ class CategoryController extends Controller
         $category = new Category();
         $category->category = $request->category;
         $category->save();
-        return response()->json(['message' => 'category created']);
+        return $this->response(1,'category created');
     }
 
     public function destroy(Category $category)
@@ -29,7 +29,8 @@ class CategoryController extends Controller
             return response()->json(['message' => 'the category has posts so it can not be deleted']);
         }
         $category->delete();
-        return response()->json(['message' => 'category deleted']);
+        return $this->response(1,'category deleted');
+
     }
 
     public function update(Category $category, Request $request)
@@ -38,7 +39,7 @@ class CategoryController extends Controller
         $category->update([
             'category' => $request->category,
         ]);
-        return response()->json(['message' => 'category updated to: ' . $request->category]);
+        return $this->response(1,'category updated to: ' . $request->category);
     }
 }
 

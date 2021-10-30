@@ -86,9 +86,9 @@ class UserController extends Controller
             User::query()->where('id', '=', auth()->id())->update([
                 'password' => Hash::make($request->new_pass)
             ]);
-            return response()->json('password changed to ' . $request->new_pass);
+            return $this->response(1,'password changed to ' . $request->new_pass);
         } else {
-            return response()->json(['message' => 'token ERROR']);
+            return $this->response(0,'token ERROR');
         }
     }
 
