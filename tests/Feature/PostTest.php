@@ -80,6 +80,7 @@ class PostTest extends TestCase
             'title' => 'electronic',
             'text' => $this->faker->text,
             'image' => $file,
+            'tag' => 't1 t2',
         ], ['authorization' => 'Bearer ' . $response['token']])->assertSee('Post created');
         $this->assertDatabaseCount('posts', 1);
 
@@ -221,6 +222,18 @@ class PostTest extends TestCase
     {
         $post = Post::factory()->create();
         $this->postJson(route('comments-addComment', $post->id), ['comment' => 'my comment'])->assertSee('Unauthenticated');
+    }
+
+
+    public function test_everyone_can_search_in_posts_and_comments()
+    {
+        Post::factory()->count(2)->has(Comment::factory()->count(2))->create();
+        Post::factory()->create(['text' => 'skylator']);
+
+        $this->postJson(route('search',), ['search' => 'm'])->assertJsonStructure([
+            [['id','title','text']],
+            [['id','name','title']]
+        ]);
     }
 }
 

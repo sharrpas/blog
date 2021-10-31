@@ -2,18 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CommentResource;
 use App\Http\Resources\PostCollection;
 use App\Http\Resources\PostResource;
+use App\Models\Comment;
 use App\Models\Like;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PostController extends Controller
 {
 
     public function index()
     {
-        return response()->json(new PostCollection(Post::query()->where('status', '=','accepted')->paginate(10)));
+        return response()->json(new PostCollection(Post::query()->where('status', '=', 'accepted')->paginate(10)));
 
 //        return response()->json(Post::query()->where('status', 'accepted')->paginate(10));
     }
@@ -21,7 +24,7 @@ class PostController extends Controller
 
     public function show(Post $post)
     {
-        return response()->json(PostResource::make($post->load('tags'),$post->load('comments')));
+        return response()->json(PostResource::make($post->load('tags'), $post->load('comments')));
     }
 
 
@@ -35,5 +38,43 @@ class PostController extends Controller
             $post->likes()->create(['ip' => $ip]);
             return \response()->json('liked');
         }
+    }
+
+    public function search(Request $request)
+    {
+        $request->validate([
+            'search' => 'required',
+            'in' => [Rule::in(['all', 'posts', 'comments'])]
+        ]);
+
+        $search = $request->search;
+        $in = $request->in != '' ? $request->in : 'all';
+
+        $search_in_post = false;
+        $search_in_comment = false;
+
+        if ($in == 'posts') $search_in_post = true;
+        if ($in == 'comments') $search_in_comment = true;
+        if ($in == 'all') {
+            $search_in_comment = true;
+            $search_in_post = true;
+        }
+
+        $posts = '';
+        $comments = '';
+        if ($search_in_post == true) {
+            $posts = PostResource::collection((Post::query()
+                ->where('title', 'LIKE', "%{$search}%")
+                ->orWhere('text', 'LIKE', "%{$search}%")
+                ->get()));
+        }
+        if ($search_in_comment == true) {
+            $comments = CommentResource::collection((Comment::query()
+                ->where('comment', 'LIKE', "%{$search}%")
+                ->orWhere('name', 'LIKE', "%{$search}%")
+                ->get()));
+        }
+
+        return [$posts, $comments];
     }
 }

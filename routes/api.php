@@ -5,6 +5,7 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\user\CategoryController;
 use App\Http\Controllers\user\PostController;
 use App\Http\Controllers\user\UserController;
+use App\Models\Post;
 use Illuminate\Support\Facades\Route;
 
 
@@ -47,7 +48,7 @@ Route::get('posts/tags/{tag}',[TagController::class,'show'])->name('posts-all-on
 Route::get('/posts/{post}/comments', [CommentController::class,'show'])->name('comments-onePost');
 Route::post('/posts/{post}/comments', [CommentController::class , 'store'])->middleware('auth:sanctum')->name('comments-addComment');
 
-
+Route::post('search',[\App\Http\Controllers\PostController::class,'search'])->name('search');
 
 
 
