@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\LikePostController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\user\CommentController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\user\CategoryController;
@@ -40,7 +42,7 @@ Route::get('posts',[\App\Http\Controllers\PostController::class,'index'])->name(
 Route::get('posts/category',[CategoryController::class,'index'])->name('categories-all');
 Route::get('posts/category/{category}',[CategoryController::class,'show'])->name('posts-all-oneCategory');
 Route::get('posts/{post}',[\App\Http\Controllers\PostController::class,'show'])->name('posts-onePost');
-Route::post('posts/{post}/like',[\App\Http\Controllers\PostController::class,'like'])->name('post-like');
+Route::post('posts/{post}/like',[LikePostController::class,'store'])->name('post-like');
 
 Route::get('tags',[TagController::class,'index'])->name('tags-all');
 Route::get('posts/tags/{tag}',[TagController::class,'show'])->name('posts-all-oneTag');
@@ -48,7 +50,7 @@ Route::get('posts/tags/{tag}',[TagController::class,'show'])->name('posts-all-on
 Route::get('/posts/{post}/comments', [CommentController::class,'show'])->name('comments-onePost');
 Route::post('/posts/{post}/comments', [CommentController::class , 'store'])->middleware('auth:sanctum')->name('comments-addComment');
 
-Route::post('search',[\App\Http\Controllers\PostController::class,'search'])->name('search');
+Route::post('search',[SearchController::class,'show'])->name('search');
 
 
 
